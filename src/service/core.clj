@@ -29,7 +29,9 @@
 
 (defroutes all-routes
   (GET "/" [] (home))
-  (not-found "<p>Page not found.</p>")) ;; all other, return 404
+  (not-found {:status  200
+   :headers {"Content-Type" "text/html"}
+   :body    "resource not found"}))
 
 (defonce server (atom nil))
 
@@ -39,8 +41,5 @@
     (reset! server nil)))
 
 (defn -main []
-  ;; The #' is useful when you want to hot-reload code
-  ;; You may want to take a look: https://github.com/clojure/tools.namespace
-  ;; and http://http-kit.org/migration.html#reload
   (log/info "server listening on port " port)
   (reset! server (srv/run-server #'all-routes {:port port})))
