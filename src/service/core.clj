@@ -17,11 +17,6 @@
               (log/warn "no PORT environment variable set, using default")
               default-port)))
 
-(defn app [req]
-  {:status  200
-   :headers {"Content-Type" "text/html"}
-   :body    "hello HTTP!"})
-
 (defn home []
   {:status 200
    :headers {"Content-Type" "application/json"}
