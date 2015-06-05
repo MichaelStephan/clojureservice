@@ -8,9 +8,10 @@
                  [org.clojure/clojure "1.6.0"]
                  [http-kit "2.1.18"]
                  [compojure "1.3.4"]
-                 [environ "1.0.0"]]
+                 [environ "1.0.0"]
+                 [com.taoensso/timbre "3.4.0"]
+                 [javax.servlet/servlet-api "2.5"]]
   :main service.core
   :profiles { 
-             :dev { :dependencies [[javax.servlet/servlet-api "2.5"]]}
-             :production { :dependencies [[javax.servlet/servlet-api "2.5"]]}
-             })
+             :dev {}
+             :production {}})
