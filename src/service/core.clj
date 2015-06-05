@@ -17,6 +17,13 @@
               (log/warn "no PORT environment variable set, using default")
               default-port)))
 
+(defonce server (atom nil))
+
+(defn stop-server []
+  (when-not (nil? @server)
+    (@server :timeout 100)
+    (reset! server nil)))
+
 (defn home []
   {:status 200
    :headers {"Content-Type" "application/json"}
@@ -27,13 +34,6 @@
   (not-found {:status  200
    :headers {"Content-Type" "text/html"}
    :body    "resource not found"}))
-
-(defonce server (atom nil))
-
-(defn stop-server []
-  (when-not (nil? @server)
-    (@server :timeout 100)
-    (reset! server nil)))
 
 (defn -main []
   (log/info "server listening on port " port)
