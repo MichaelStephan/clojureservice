@@ -1,21 +1,22 @@
 (ns service.core
+
   (:gen-class)
   (:require
-    [taoensso.timbre :as log] 
-    [environ.core :refer [env]]
-    [org.httpkit.server :as srv])
+   [taoensso.timbre :as log] 
+   [environ.core :refer [env]]
+   [org.httpkit.server :as srv])
   (:use
-    [compojure.route :only [files not-found]]
-    [compojure.handler :only [site]]
-    [compojure.core :only [defroutes GET POST DELETE ANY context]]))
+   [compojure.route :only [files not-found]]
+   [compojure.handler :only [site]]
+   [compojure.core :only [defroutes GET POST DELETE ANY context]]))
 
 (def default-port 9000)
 
-(def port (try
-            (read-string (:port env))
-            (catch Exception e 
-              (log/warn "no PORT environment variable set, using default")
-              default-port)))
+(defn port [] (try
+                (read-string (:port env))
+                (catch Exception e 
+                  (log/warn "no PORT environment variable set, using default")
+                  default-port)))
 
 (defonce server (atom nil))
 
@@ -31,10 +32,11 @@
 
 (defroutes all-routes
   (GET "/" [] (home))
-  (not-found {:status  200
-   :headers {"Content-Type" "text/html"}
-   :body    "resource not found"}))
+  (not-found {:status 404 
+              :headers {"Content-Type" "text/html"}
+              :body    "resource not found"}))
 
 (defn -main []
-  (log/info "server listening on port " port)
-  (reset! server (srv/run-server #'all-routes {:port port})))
+  (let [port (port)]
+    (log/info "server listening on port " port)
+    (reset! server (srv/run-server #'all-routes {:port port}))))
