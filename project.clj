@@ -9,5 +9,7 @@
                  [environ "1.0.3"]
                  [com.taoensso/timbre "4.7.3"]
                  [javax.servlet/servlet-api "2.5"]
-                 [org.clojure/core.async "0.2.385"]]
+                 [org.clojure/core.async "0.2.385"]
+                 [org.clojure/data.json "0.2.6"]
+                 [slingshot "0.12.2"]]
   :main service.core)
