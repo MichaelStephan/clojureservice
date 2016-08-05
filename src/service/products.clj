@@ -5,54 +5,55 @@
             [org.httpkit.client :as http]
             [clojure.data.json :as json]))
 
-(def tenant "hugo4")
-(def service-url "https://api.yaas.io/hybris/product/v2")
-(def products-url (str service-url "/" tenant "/products"))
+(def product-service-url "https://api.yaas.io/hybris/product/v2") 
 
-(defn product [product-id & options]
+(defn products-url [tenant]
+  (str product-service-url "/" tenant "/products"))
+
+(defn product-url [tenant product-id]
+  (str (products-url tenant) "/" product-id))
+
+(defn product [tenant product-id & options]
   (let [{:keys [oauth-token] :as options} (apply hash-map options)
         ch (chan)
-        url (str products-url "/" product-id)]
+        url (product-url tenant product-id)]
     (http/get url 
               {:timeout 2000
                :oauth-token oauth-token}
-              (fn [res]
-                (go
-                  (>! ch
-                      (common/res->json url res 200))
-                  (close! ch))))
+              (common/res-handler ch url))
     ch))
 
-(defn create-product [product & options]
+(defn create-product [tenant product & options]
   (let [{:keys [oauth-token] :as options} (apply hash-map options)
-        ch (chan)]
-    (http/post products-url
+        ch (chan)
+        url (products-url tenant)]
+    (http/post url 
               {:timeout 2000
                :headers {"Content-type" "application/json"
                          "Accept" "application/json"}
                :oauth-token oauth-token
                :body (common/clj->json product)} 
-               (fn [res]
-                (go
-                  (>! ch
-                      (common/res->json products-url res 201))
-                  (close! ch))))
+               (common/res-handler ch url :expected-status 201))
     ch))
 
-(def new-product {:code 456
-                  :name {:en "bla bla"}
-                  :description {:en 123}
-                  :published false
-                  :media []
-                  :metadata {:version 1
-                             :mixins {}}
-                  :mixins {}})
-
 (comment
-(defn testx1 []
-  (go
-    (let [{:keys [access_token]}
-          (<! (oauth/token-from-client-credentials "no" "no" ["hybris.product_read_unpublished" "hybris.product_create"]))]
-      (when access_token
-        (println (<! (create-product new-product :oauth-token access_token)))
-        #_(println (<! (product "57a0a177007fa1001d5d0d62" :oauth-token access_token))))))))
+  (defn testx2 []
+    (go
+      (let [{:keys [access_token]}
+            (<! (oauth/token-from-client-credentials "id" "secret" ["hybris.product_read_unpublished"]))]
+        (when access_token
+          (println (<! (product "hugo4" "57a1d326289c48001daef0c4" :oauth-token access_token)))))))
+
+  (def new-product {:code 4760
+                    :name {:en "bla bla"}
+                    :description {:en 123}
+                    :metadata {:mixins {:entitytype "https://api.yaas.io/hybris/schema/v1/hugo4/entitytype"}}
+                    :mixins {:entitytype {:name "subscriptionproduct"}}})
+
+  (defn testx1 []
+    (go
+      (let [{:keys [access_token] :as resp}
+            (<! (oauth/token-from-client-credentials "id" "secret" ["hybris.product_read_unpublished" "hybris.product_create"]))]
+        (if access_token
+          (println (<! (create-product "hugo4" new-product :oauth-token access_token)))
+          (println resp))))))

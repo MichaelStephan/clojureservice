@@ -11,5 +11,6 @@
                  [javax.servlet/servlet-api "2.5"]
                  [org.clojure/core.async "0.2.385"]
                  [org.clojure/data.json "0.2.6"]
-                 [slingshot "0.12.2"]]
+                 [slingshot "0.12.2"]
+                 [com.taoensso/timbre "4.7.0"]]
   :main service.core)
