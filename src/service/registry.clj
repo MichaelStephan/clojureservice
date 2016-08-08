@@ -5,7 +5,7 @@
             [org.httpkit.client :as http]
             [clojure.data.json :as json]))
 
-(def registry-url "https://d022172-aspect-registry.cfapps.sap.hana.ondemand.com/aspect-registry")
+(def registry-url "https://api.stage.yaas.io/haha/registry/v1/aspect-registry")
 
 (defn functions [entity entity-type function-name & options]
   (let [ch (chan)
